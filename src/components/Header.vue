@@ -4,9 +4,15 @@
     <router-link to="/">
       <h1>whisp.</h1>
     </router-link>
-    <div class="btns">
+    <div v-if="currentUser" class="btns">
+      <button :style="'background-image: url('+currentUser.photoURL+')'"></button>
+      <button @click="signOut">
+        <fa icon="sign-out-alt" />
+      </button>
+    </div>
+    <div v-else class="btns">
       <button @click="signIn">
-        <fa icon="user"/>
+        <fa icon="user" />
       </button>
     </div>
   </header>
@@ -17,8 +23,18 @@ import firebase from 'firebase'
 import { auth } from '../main'
 
 export default {
+  data() {
+    return {
+      currentUser: {}
+    }
+  },
+  created() {
+    auth.onAuthStateChanged(user => {
+      this.currentUser = user
+    })
+  },
   methods: {
-    signIn () {
+    signIn() {
       const provider = new firebase.auth.GoogleAuthProvider()
       auth.signInWithPopup(provider)
       .then((result) => {
